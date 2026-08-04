@@ -34,7 +34,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "build>=1.2,<2",
-  "mypy>=1.15,<2",
+  "mypy>=1.15,<3",
   "nbformat>=5.10,<6",
   "pandas-stubs>=2.2,<3",
   "pytest>=8.3,<9",
