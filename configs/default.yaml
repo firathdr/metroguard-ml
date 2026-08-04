@@ -1,0 +1,43 @@
+project:
+  name: metroguard-ml
+  version: 1.0.0
+  seed: 42
+
+data:
+  source_url: "https://archive.ics.uci.edu/static/public/791/metropt%2B3%2Bdataset.zip"
+  doi: "10.24432/C5VW3R"
+  expected_sha256: "aab991a970e58210de853bb8078ce0e63abb4d9412fdc5c79792dae3d8e1721a"
+  raw_zip: data/raw/metropt3.zip
+  raw_csv: data/raw/MetroPT3(AirCompressor).csv
+  features_file: data/processed/features.parquet
+  bin_minutes: 5
+  expected_samples_per_bin: 30
+  minimum_coverage: 0.80
+  sequence_bins: 12
+
+split:
+  train_start: "2020-02-01 00:00:00"
+  train_end: "2020-02-21 23:59:59"
+  calibration_start: "2020-02-22 01:00:00"
+  calibration_end: "2020-02-29 23:59:59"
+  test_start: "2020-03-01 01:00:00"
+  test_end: "2020-09-01 03:59:50"
+
+model:
+  primary: tcn_autoencoder
+  pca_variance: 0.95
+  isolation_forest_trees: 300
+  batch_size: 128
+  max_epochs: 30
+  patience: 5
+  learning_rate: 0.001
+
+alert:
+  ewma_alpha: 0.2
+  threshold_quantile: 0.995
+  persistence_hits: 3
+  persistence_window: 4
+  merge_minutes: 30
+  cooldown_hours: 6
+  early_warning_hours: 24
+  late_boundary_hours: 2

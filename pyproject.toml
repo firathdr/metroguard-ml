@@ -1,0 +1,77 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "metroguard-ml"
+version = "1.0.0"
+description = "Explainable early-warning anomaly detection for metro air compressors using MetroPT-3."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "Fırat Yavaş"}]
+keywords = ["predictive-maintenance", "time-series", "anomaly-detection", "data-science"]
+dependencies = [
+  "fastapi>=0.116,<1",
+  "httpx>=0.28,<1",
+  "joblib>=1.5,<2",
+  "matplotlib>=3.10,<4",
+  "numpy>=2.2,<3",
+  "pandas>=2.2,<3",
+  "plotly>=6.0,<7",
+  "pyarrow>=19,<24",
+  "pydantic>=2.11,<3",
+  "PyYAML>=6.0,<7",
+  "scikit-learn>=1.6,<2",
+  "shap>=0.47,<1",
+  "streamlit>=1.45,<2",
+  "torch>=2.6,<3",
+  "typer>=0.16,<1",
+  "uvicorn>=0.34,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.2,<2",
+  "mypy>=1.15,<2",
+  "nbformat>=5.10,<6",
+  "pandas-stubs>=2.2,<3",
+  "pytest>=8.3,<9",
+  "pytest-cov>=6,<8",
+  "ruff>=0.11,<1",
+  "types-PyYAML>=6.0,<7",
+]
+
+[project.scripts]
+metroguard = "metroguard.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --cov=metroguard --cov-report=term-missing --cov-fail-under=80"
+markers = ["integration: integration tests", "slow: full-data or training tests"]
+
+[tool.coverage.run]
+branch = true
+omit = [
+  "src/metroguard/cli.py",
+  "src/metroguard/dashboard.py",
+  "src/metroguard/pipeline.py",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+exclude = ["notebooks/", "tests/"]

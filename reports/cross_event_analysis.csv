@@ -1,0 +1,17 @@
+model,held_out_block,selected_quantile,selected_threshold,early_detected,late_detected,lead_time_hours,false_alarms_per_day,status
+robust_z,B1,0.999,18.211254119873047,False,False,,0.0,exploratory; threshold selected on the other three event blocks
+robust_z,B2,0.995,16.187780380249023,False,False,,0.0945522992405174,exploratory; threshold selected on the other three event blocks
+robust_z,B3,0.995,16.187780380249023,False,False,,0.16121358000503794,exploratory; threshold selected on the other three event blocks
+robust_z,B4,0.99,16.187780380249023,False,False,,0.0,exploratory; threshold selected on the other three event blocks
+pca,B1,0.999,194.2682342529297,False,False,,0.0,exploratory; threshold selected on the other three event blocks
+pca,B2,0.999,194.2682342529297,False,False,,0.0,exploratory; threshold selected on the other three event blocks
+pca,B3,0.999,186.76968853759737,False,False,,0.040303395001259484,exploratory; threshold selected on the other three event blocks
+pca,B4,0.999,194.26820373535156,False,True,,0.0,exploratory; threshold selected on the other three event blocks
+isolation_forest,B1,0.999,11.086155320846286,False,False,,0.0,exploratory; threshold selected on the other three event blocks
+isolation_forest,B2,0.999,11.043216888596511,False,False,,0.0,exploratory; threshold selected on the other three event blocks
+isolation_forest,B3,0.999,11.058850157920542,False,False,,0.0,exploratory; threshold selected on the other three event blocks
+isolation_forest,B4,0.999,11.086891894210085,False,False,,0.0,exploratory; threshold selected on the other three event blocks
+tcn_autoencoder,B1,0.999,1389.1370380859375,False,False,,0.0,exploratory; threshold selected on the other three event blocks
+tcn_autoencoder,B2,0.999,1389.1237719726562,False,False,,0.0,exploratory; threshold selected on the other three event blocks
+tcn_autoencoder,B3,0.999,1218.3663374023379,False,False,,0.040303395001259484,exploratory; threshold selected on the other three event blocks
+tcn_autoencoder,B4,0.999,1389.1167895507813,False,True,,0.0,exploratory; threshold selected on the other three event blocks
