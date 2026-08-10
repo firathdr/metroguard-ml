@@ -74,6 +74,9 @@ notebooks for the full methodology and limitations.
 
 ## Quickstart
 
+To inspect the available commands without running the reproduction pipeline, use
+`metroguard --help`.
+
 ### Native Python
 
 ```powershell
