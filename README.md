@@ -44,6 +44,10 @@ to false alarms/day.
 
 ![Isolation Forest TreeSHAP signal contributions](reports/figures/isolation_forest_shap.png)
 
+SHAP-based global, local, and time-window explanations are packaged for portfolio sharing in
+[`project_to_sharewithportfoy/`](project_to_sharewithportfoy/). The reusable implementation is in
+[`src/metroguard/explainability.py`](src/metroguard/explainability.py).
+
 ## Study design
 
 ```mermaid
