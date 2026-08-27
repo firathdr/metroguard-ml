@@ -20,6 +20,12 @@ from metroguard.alerts import apply_alert_policy, calibration_threshold
 from metroguard.artifacts import ModelBundle, git_revision, save_bundle, write_json
 from metroguard.config import AppConfig
 from metroguard.data import load_features, load_raw_csv, sha256_file
+from metroguard.explainability import (
+    explain_isolation_forest,
+    plot_global_sensor_importance,
+    plot_local_sensor_contributions,
+    plot_sensor_time_heatmap,
+)
 from metroguard.features import sensor_from_feature
 from metroguard.metrics import EVENTS, evaluate_alerts, horizon_sensitivity
 from metroguard.models import (
@@ -238,8 +244,6 @@ def write_cross_event_analysis(config: AppConfig) -> pd.DataFrame:
 
 def write_isolation_shap(config: AppConfig, sample_size: int = 256) -> pd.DataFrame:
     """Create sampled TreeSHAP signal contributions for the Isolation Forest comparator."""
-    import shap
-
     from metroguard.artifacts import load_bundle
 
     bundle = load_bundle(config.root / "artifacts" / "release" / "model_bundle.joblib")
@@ -252,41 +256,33 @@ def write_isolation_shap(config: AppConfig, sample_size: int = 256) -> pd.DataFr
         ),
         config,
     )["test"]
-    stride = max(1, len(windows.values) // sample_size)
-    sampled = bundle.scaler.transform(windows.values[::stride][:sample_size])
-    flat = sampled.reshape(len(sampled), -1)
-    explainer = shap.TreeExplainer(bundle.isolation_forest.model)
-    shap_values = np.asarray(explainer.shap_values(flat))
-    feature_values = cast(
-        np.ndarray,
-        np.abs(shap_values)
-        .reshape(len(sampled), bundle.sequence_bins, len(bundle.feature_names))
-        .mean(axis=(0, 1)),
+    scaled_windows = bundle.scaler.transform(windows.values)
+    explanation = explain_isolation_forest(
+        bundle.isolation_forest.model,
+        scaled_windows,
+        bundle.feature_names,
+        bundle.sequence_bins,
+        sample_size=sample_size,
     )
-    grouped: dict[str, float] = {}
-    for feature, value in zip(bundle.feature_names, feature_values, strict=True):
-        sensor = sensor_from_feature(feature)
-        grouped[sensor] = grouped.get(sensor, 0.0) + float(value)
-    grouped_items: list[tuple[str, float]] = list(grouped.items())
-    grouped_items.sort(key=lambda item: item[1], reverse=True)
-    result = pd.DataFrame(
-        grouped_items,
-        columns=["sensor", "mean_absolute_shap"],
+    reports = config.root / "reports"
+    figures = reports / "figures"
+    explanation.sensor_importance.to_csv(reports / "isolation_forest_shap.csv", index=False)
+    explanation.local_sensor_contributions.to_csv(
+        reports / "isolation_forest_shap_local.csv", index=False
     )
-    result["normalized_contribution"] = result["mean_absolute_shap"] / result[
-        "mean_absolute_shap"
-    ].sum()
-    result.to_csv(config.root / "reports" / "isolation_forest_shap.csv", index=False)
-    figure, axis = plt.subplots(figsize=(8, 5))
-    top = result.head(10).sort_values("normalized_contribution")
-    axis.barh(top["sensor"], top["normalized_contribution"], color="#2166ac")
-    axis.set_xlabel("Normalized mean |SHAP value|")
-    axis.set_title("Isolation Forest: sampled holdout signal contributions")
-    axis.grid(axis="x", alpha=0.2)
-    figure.tight_layout()
-    figure.savefig(config.root / "reports" / "figures" / "isolation_forest_shap.png", dpi=160)
-    plt.close(figure)
-    return result
+    explanation.sensor_time_importance.to_csv(
+        reports / "isolation_forest_shap_time.csv"
+    )
+    plot_global_sensor_importance(explanation.sensor_importance, figures / "isolation_forest_shap.png")
+    plot_local_sensor_contributions(
+        explanation.local_sensor_contributions,
+        figures / "isolation_forest_shap_local.png",
+    )
+    plot_sensor_time_heatmap(
+        explanation,
+        figures / "isolation_forest_shap_heatmap.png",
+    )
+    return explanation.sensor_importance
 
 
 def train_all(config: AppConfig) -> dict[str, Any]:
